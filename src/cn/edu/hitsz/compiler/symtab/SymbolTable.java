@@ -85,4 +85,3 @@ public class SymbolTable {
         FileUtils.writeLines(path, lines);
     }
 }
-

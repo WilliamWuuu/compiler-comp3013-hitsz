@@ -1,0 +1,35 @@
+D -> int
+S -> D id
+D -> int
+S -> D id
+B -> IntConst
+A -> B
+E -> A
+S -> id = E
+B -> id
+A -> B
+B -> IntConst
+A -> A / B
+E -> A
+B -> IntConst
+A -> B
+B -> id
+A -> B
+E -> A
+B -> IntConst
+A -> B
+E -> E - A
+B -> ( E )
+A -> A * B
+E -> E + A
+S -> id = E
+B -> id
+A -> B
+E -> A
+S -> return E
+S_list -> S Semicolon
+S_list -> S Semicolon S_list
+S_list -> S Semicolon S_list
+S_list -> S Semicolon S_list
+S_list -> S Semicolon S_list
+P -> S_list

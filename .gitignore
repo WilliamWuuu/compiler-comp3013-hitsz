@@ -11,3 +11,7 @@ template/
 
 # for python script
 __pycache__
+
+# MacOS X
+**/.DS_Store
+

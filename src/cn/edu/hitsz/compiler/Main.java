@@ -17,6 +17,8 @@ import cn.edu.hitsz.compiler.utils.IREmulator;
 import java.util.Objects;
 
 public class Main {
+    private static final boolean RUN_FULL_PIPELINE = false;
+
     public static void main(String[] args) {
         // 构建符号表以供各部分使用
         TokenKind.loadTokenKinds();
@@ -49,19 +51,25 @@ public class Main {
         final var productionCollector = new ProductionCollector(GrammarInfo.getBeginProduction());
         parser.registerObserver(productionCollector);
 
-        // 加入用作语义检查的 Observer
-        final var semanticAnalyzer = new SemanticAnalyzer();
-        parser.registerObserver(semanticAnalyzer);
+        IRGenerator irGenerator = null;
+        if (RUN_FULL_PIPELINE) {
+            // 仅在启用完整流水线时注册实验三/四观察者
+            final var semanticAnalyzer = new SemanticAnalyzer();
+            parser.registerObserver(semanticAnalyzer);
 
-        // 加入用作 IR 生成的 Observer
-        final var irGenerator = new IRGenerator();
-        parser.registerObserver(irGenerator);
+            irGenerator = new IRGenerator();
+            parser.registerObserver(irGenerator);
+        }
 
         // 执行语法解析并在解析过程中依次调用各 Observer
         parser.run();
 
         // 各 Observer 输出结果
         productionCollector.dumpToFile(FilePathConfig.PARSER_PATH);
+        if (!RUN_FULL_PIPELINE) {
+            return;
+        }
+
         symbolTable.dumpTable(FilePathConfig.NEW_SYMBOL_TABLE);
         final var instructions = irGenerator.getIR();
         irGenerator.dumpIR(FilePathConfig.INTERMEDIATE_CODE_PATH);
