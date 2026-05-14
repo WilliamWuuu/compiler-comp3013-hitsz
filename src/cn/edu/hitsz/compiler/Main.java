@@ -51,10 +51,11 @@ public class Main {
         final var productionCollector = new ProductionCollector(GrammarInfo.getBeginProduction());
         parser.registerObserver(productionCollector);
 
-        IRGenerator irGenerator = null;
-        if (RUN_FULL_PIPELINE) {
-            return;
-        }
+        final var semanticAnalyzer = new SemanticAnalyzer();
+        parser.registerObserver(semanticAnalyzer);
+
+        final var irGenerator = new IRGenerator();
+        parser.registerObserver(irGenerator);
 
         // 执行语法解析并在解析过程中依次调用各 Observer
         parser.run();
@@ -68,6 +69,11 @@ public class Main {
         symbolTable.dumpTable(FilePathConfig.NEW_SYMBOL_TABLE);
         final var instructions = irGenerator.getIR();
         irGenerator.dumpIR(FilePathConfig.INTERMEDIATE_CODE_PATH);
+
+        final var asmGenerator = new AssemblyGenerator();
+        asmGenerator.loadIR(instructions);
+        asmGenerator.run();
+        asmGenerator.dump(FilePathConfig.ASSEMBLY_LANGUAGE_PATH);
 
         // 模拟执行 IR 并输出结果
         final var emulator = IREmulator.load(instructions);
